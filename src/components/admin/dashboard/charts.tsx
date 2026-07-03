@@ -10,10 +10,7 @@ const PROGRAM_DATA = [
   { name: "Bilingual", value: 35, color: "#3b82f6" },
 ];
 
-const GENDER_DATA = [
-  { name: "Laki-laki", value: 80, color: "#3b82f6" },
-  { name: "Perempuan", value: 65, color: "#ec4899" },
-];
+
 
 const REGISTRATION_TREND = [
   { date: "1 Jul", reguler: 12, tahfidz: 5, bahasa: 4 },

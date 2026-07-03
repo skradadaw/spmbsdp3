@@ -20,7 +20,7 @@ export function Step4({ onPrev, isSubmitting, settings = {} }: Step4Props) {
     formState: { errors },
   } = useFormContext<Step4Data>();
 
-  const formValues = watch();
+
 
   const feeAmount = settings.biaya_pendaftaran || REGISTRATION_FEE.amount;
   const formattedFee = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(feeAmount);

@@ -11,7 +11,6 @@ import {
   Gear, 
   FileText, 
   SignOut, 
-  Buildings, 
   Eye, 
   List, 
   X 
