@@ -13,7 +13,7 @@ export async function getPendaftarList() {
   // Tapi untuk amannya dan karena admin sudah login, kita query saja:
   const { data, error } = await (supabase as any)
     .from("pendaftar")
-    .select("*")
+    .select("*, dokumen(*)")
     .order("created_at", { ascending: false })
     .limit(1000); // Prevent unbounded fetching
 

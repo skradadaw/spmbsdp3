@@ -168,8 +168,8 @@ export const DOCUMENT_TYPES = [
   },
 ] as const;
 
-export const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB in bytes
-export const MAX_FILE_SIZE_DISPLAY = "5 MB";
+export const MAX_FILE_SIZE = 2 * 1024 * 1024; // 2MB in bytes
+export const MAX_FILE_SIZE_DISPLAY = "2 MB";
 
 export const ALLOWED_MIME_TYPES = [
   "application/pdf",

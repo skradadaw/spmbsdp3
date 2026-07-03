@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, ChangeEvent, DragEvent, useEffect } from "react";
+import imageCompression from "browser-image-compression";
 import { ALLOWED_MIME_TYPES, MAX_FILE_SIZE, MAX_FILE_SIZE_DISPLAY } from "@/lib/constants";
 
 interface FileUploadProps {
@@ -27,6 +28,7 @@ export function FileUpload({
   const [isDragging, setIsDragging] = useState(false);
   const [localError, setLocalError] = useState<string | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [isCompressing, setIsCompressing] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const formatText = accept.includes("pdf") ? "PDF atau Gambar" : "Gambar";
@@ -43,18 +45,43 @@ export function FileUpload({
 
   const displayError = error || localError;
 
-  const handleFile = (file: File) => {
+  const handleFile = async (file: File) => {
     setLocalError(null);
+    let fileToUpload = file;
 
-    // Validate size
-    if (file.size > MAX_FILE_SIZE) {
+    // Compress if it's an image
+    if (file.type.startsWith("image/")) {
+      try {
+        setIsCompressing(true);
+        const options = {
+          maxSizeMB: 0.5, // 500KB limit for images
+          maxWidthOrHeight: 1200,
+          useWebWorker: true,
+          fileType: "image/webp" as string, // Convert to WebP
+        };
+        const compressedBlob = await imageCompression(file, options);
+        // Convert Blob to File, changing extension to .webp
+        fileToUpload = new File(
+          [compressedBlob], 
+          file.name.replace(/\.[^/.]+$/, ".webp"), 
+          { type: "image/webp" }
+        );
+      } catch (error) {
+        console.error("Compression failed, using original file:", error);
+      } finally {
+        setIsCompressing(false);
+      }
+    }
+
+    // Validate size (MAX_FILE_SIZE = 5MB, usually only hits for PDFs now)
+    if (fileToUpload.size > MAX_FILE_SIZE) {
       setLocalError(`Ukuran file maksimal ${MAX_FILE_SIZE_DISPLAY}`);
       if (onChange) onChange(null);
       return;
     }
 
     // Pass up
-    if (onChange) onChange(file);
+    if (onChange) onChange(fileToUpload);
   };
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -126,10 +153,10 @@ export function FileUpload({
             📁
           </div>
           <div className="text-base font-semibold text-text mb-1">
-            Klik untuk Unggah atau Seret File
+            {isCompressing ? "Sedang mengompres gambar..." : "Klik untuk Unggah atau Seret File"}
           </div>
           <div className="text-sm text-text-secondary">
-            Format: {formatText} (Max. {MAX_FILE_SIZE_DISPLAY})
+            {isCompressing ? "Mohon tunggu sebentar" : `Format: ${formatText} (Max. ${MAX_FILE_SIZE_DISPLAY})`}
           </div>
         </div>
       ) : (

@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import { Button } from "@/components/ui/button";
 
 interface ExcelExportProps {
@@ -8,46 +7,88 @@ interface ExcelExportProps {
 }
 
 export function ExcelExport({ data }: ExcelExportProps) {
-  const [isOpen, setIsOpen] = useState(false);
-  
-  // Selection states
-  const [includeSiswa, setIncludeSiswa] = useState(true);
-  const [includeOrangTua, setIncludeOrangTua] = useState(true);
-  const [includeStatus, setIncludeStatus] = useState(true);
-
   const handleExport = async () => {
     if (data.length === 0) {
       alert("Tidak ada data pendaftar untuk diekspor.");
       return;
     }
 
-    const exportData = data.map((item, index) => {
-      let row: any = { No: index + 1, "Nomor Pendaftaran": item.nomor_pendaftaran };
+    const exportData = data.map((item: any, index: number) => {
+      // Helper to find a document URL by type
+      const getDocUrl = (jenis: string) => {
+        const doc = item.dokumen?.find((d: any) => d.jenis_dokumen === jenis);
+        return doc?.file_url || "";
+      };
 
-      if (includeSiswa) {
-        row["Nama Lengkap"] = item.nama_lengkap;
-        row["Nama Panggilan"] = item.nama_panggilan;
-        row["NIK"] = item.nik;
-        row["NISN"] = item.nisn;
-        row["Tempat, Tanggal Lahir"] = `${item.tempat_lahir}, ${item.tanggal_lahir}`;
-        row["Jenis Kelamin"] = item.jenis_kelamin === 'L' ? 'Laki-Laki' : 'Perempuan';
-        row["Agama"] = item.agama;
-        row["Asal Sekolah"] = item.asal_sekolah;
-        row["Pilihan Kelas"] = item.pilihan_kelas;
-      }
+      const row: any = {
+        // ── Umum ──
+        "No": index + 1,
+        "Nomor Pendaftaran": item.nomor_pendaftaran,
+        "Status": item.status,
+        "Jenis Pendaftaran": item.jenis_pendaftaran,
+        "Pilihan Kelas": item.pilihan_kelas,
+        "Kelas Tujuan (Pindahan)": item.kelas_tujuan || "-",
 
-      if (includeOrangTua) {
-        row["Nama Ayah"] = item.nama_ayah;
-        row["No. HP Ayah"] = item.no_hp_ayah;
-        row["Nama Ibu"] = item.nama_ibu;
-        row["No. HP Ibu"] = item.no_hp_ibu;
-        row["Alamat Lengkap"] = item.alamat_lengkap || item.alamat;
-      }
+        // ── Saudara Kandung ──
+        "Punya Saudara di Al-Muhajirin": item.punya_saudara,
+        "Nama Saudara": item.nama_saudara || "-",
+        "Unit Saudara": item.unit_saudara || "-",
+        "Kelas Saudara": item.kelas_saudara || "-",
 
-      if (includeStatus) {
-        row["Status"] = item.status;
-        row["Tanggal Daftar"] = new Date(item.created_at).toLocaleDateString("id-ID");
-      }
+        // ── Identitas Siswa ──
+        "Nama Lengkap": item.nama_lengkap,
+        "Nama Panggilan": item.nama_panggilan,
+        "NIK": item.nik,
+        "NISN": item.nisn || "-",
+        "Tempat Lahir": item.tempat_lahir,
+        "Tanggal Lahir": item.tanggal_lahir,
+        "Jenis Kelamin": item.jenis_kelamin === "L" ? "Laki-Laki" : "Perempuan",
+        "Agama": item.agama,
+        "Kewarganegaraan": item.kewarganegaraan,
+        "Anak Ke": item.anak_ke,
+        "Jumlah Saudara": item.jumlah_saudara,
+        "Alamat": item.alamat,
+        "Asal Sekolah": item.asal_sekolah,
+
+        // ── Prestasi ──
+        "Memiliki Prestasi": item.memiliki_prestasi,
+        "Nama Prestasi": item.nama_prestasi || "-",
+        "Tingkat Prestasi": item.tingkat_prestasi || "-",
+        "Tahun Prestasi": item.tahun_prestasi || "-",
+
+        // ── Data Ayah ──
+        "Nama Ayah": item.nama_ayah,
+        "NIK Ayah": item.nik_ayah,
+        "Tahun Lahir Ayah": item.tahun_lahir_ayah,
+        "Pendidikan Ayah": item.pendidikan_ayah,
+        "Pekerjaan Ayah": item.pekerjaan_ayah,
+        "Penghasilan Ayah": item.penghasilan_ayah,
+        "No. HP Ayah": item.no_hp_ayah,
+
+        // ── Data Ibu ──
+        "Nama Ibu": item.nama_ibu,
+        "NIK Ibu": item.nik_ibu,
+        "Tahun Lahir Ibu": item.tahun_lahir_ibu,
+        "Pendidikan Ibu": item.pendidikan_ibu,
+        "Pekerjaan Ibu": item.pekerjaan_ibu,
+        "Penghasilan Ibu": item.penghasilan_ibu,
+        "No. HP Ibu": item.no_hp_ibu,
+
+        // ── Lain-lain ──
+        "Sumber Informasi": item.sumber_informasi,
+        "Nilai OKB": item.nilai_okb || "-",
+        "Catatan Admin": item.catatan_admin || "-",
+
+        // ── Berkas / Dokumen ──
+        "URL Akta Lahir": getDocUrl("akta_lahir"),
+        "URL Kartu Keluarga": getDocUrl("kk"),
+        "URL Pas Foto": getDocUrl("pas_foto"),
+        "URL Bukti Pembayaran": getDocUrl("bukti_bayar"),
+
+        // ── Tanggal ──
+        "Tanggal Daftar": new Date(item.created_at).toLocaleDateString("id-ID"),
+        "Terakhir Diperbarui": new Date(item.updated_at).toLocaleDateString("id-ID"),
+      };
 
       return row;
     });
@@ -75,63 +116,11 @@ export function ExcelExport({ data }: ExcelExportProps) {
 
     // Generate Excel file
     XLSX.writeFile(workbook, `Data_Pendaftar_SPMB_${new Date().toISOString().split('T')[0]}.xlsx`);
-    
-    setIsOpen(false);
   };
 
   return (
-    <>
-      <Button variant="secondary" onClick={() => setIsOpen(true)}>
-        Unduh Excel
-      </Button>
-
-      {isOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-          <div className="bg-[var(--color-bg)] rounded-[var(--radius-xl)] shadow-lg max-w-md w-full p-6 animate-in zoom-in-95 duration-200">
-            <h2 className="text-xl font-bold mb-2">Export Data ke Excel</h2>
-            <p className="text-sm text-[var(--color-text-secondary)] mb-6">Pilih informasi apa saja yang ingin Anda sertakan di dalam file laporan.</p>
-            
-            <div className="flex flex-col gap-3 mb-6">
-              <label className="flex items-center gap-3 cursor-pointer">
-                <input 
-                  type="checkbox" 
-                  checked={includeSiswa} 
-                  onChange={(e) => setIncludeSiswa(e.target.checked)}
-                  className="w-4 h-4 text-[var(--color-primary)] rounded border-[var(--color-border)] focus:ring-[var(--color-primary)]"
-                />
-                <span className="text-[var(--color-text)]">Data Identitas Siswa & Pilihan Kelas</span>
-              </label>
-              <label className="flex items-center gap-3 cursor-pointer">
-                <input 
-                  type="checkbox" 
-                  checked={includeOrangTua} 
-                  onChange={(e) => setIncludeOrangTua(e.target.checked)}
-                  className="w-4 h-4 text-[var(--color-primary)] rounded border-[var(--color-border)] focus:ring-[var(--color-primary)]"
-                />
-                <span className="text-[var(--color-text)]">Data Orang Tua & Alamat</span>
-              </label>
-              <label className="flex items-center gap-3 cursor-pointer">
-                <input 
-                  type="checkbox" 
-                  checked={includeStatus} 
-                  onChange={(e) => setIncludeStatus(e.target.checked)}
-                  className="w-4 h-4 text-[var(--color-primary)] rounded border-[var(--color-border)] focus:ring-[var(--color-primary)]"
-                />
-                <span className="text-[var(--color-text)]">Status Seleksi & Tanggal Daftar</span>
-              </label>
-            </div>
-
-            <div className="flex justify-end gap-3">
-              <Button variant="ghost" onClick={() => setIsOpen(false)}>
-                Batal
-              </Button>
-              <Button onClick={handleExport}>
-                Mulai Unduh
-              </Button>
-            </div>
-          </div>
-        </div>
-      )}
-    </>
+    <Button variant="secondary" onClick={handleExport}>
+      Unduh Excel
+    </Button>
   );
 }

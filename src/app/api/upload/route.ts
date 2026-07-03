@@ -11,8 +11,8 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'File is required' }, { status: 400 })
     }
 
-    if (file.size > 5 * 1024 * 1024) {
-      return NextResponse.json({ error: 'Ukuran file maksimal 5MB' }, { status: 400 })
+    if (file.size > 2 * 1024 * 1024) {
+      return NextResponse.json({ error: 'Ukuran file maksimal 2MB' }, { status: 400 })
     }
 
     const supabase = await createClient()

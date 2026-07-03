@@ -99,7 +99,7 @@ export const step3Schema = z.object({
 // Helper for file validation in Zod (Browser environment only, as File is a web API)
 const fileSchema = z.any()
   .refine((file) => file instanceof File, "Mohon unggah dokumen ini")
-  .refine((file) => file?.size <= MAX_FILE_SIZE, "Maaf, ukuran file maksimal adalah 5MB")
+  .refine((file) => file?.size <= MAX_FILE_SIZE, "Maaf, ukuran file maksimal adalah 2MB")
   .refine((file) => ALLOWED_MIME_TYPES.includes(file?.type), "Maaf, format file ini belum didukung (gunakan PDF/JPG/PNG)");
 
 // Step 4: Unggah Dokumen
