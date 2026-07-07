@@ -1,6 +1,3 @@
-"use client";
-
-import { useEffect, useState } from "react";
 import Link from "next/link";
 import { getDashboardMetrics } from "./actions";
 import { 
@@ -28,16 +25,12 @@ function CardTitle({ children, className = "" }: { children: React.ReactNode, cl
 
 // --------------------------------------
 
-export default function AdminDashboardPage() {
-  const [metrics, setMetrics] = useState<any>(null);
-  const [error, setError] = useState<string | null>(null);
+export const dynamic = "force-dynamic";
 
-  useEffect(() => {
-    getDashboardMetrics().then((res) => {
-      if (res.error) setError(res.error);
-      else setMetrics(res.data);
-    });
-  }, []);
+export default async function AdminDashboardPage() {
+  const res = await getDashboardMetrics();
+  const metrics = res.data || null;
+  const error = res.error || null;
 
   const diterima = metrics?.diterima || 0;
   const totalMasuk = metrics?.total || 0;

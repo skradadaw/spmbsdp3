@@ -75,6 +75,7 @@ export async function updateStatusPendaftar(id: string, status: string, catatan?
 
   revalidatePath("/admin/pendaftar");
   revalidatePath(`/admin/pendaftar/${id}`);
+  revalidatePath("/admin/dashboard");
 
   // Catat ke log aktivitas
   await insertLogAktivitas("UPDATE_STATUS_PENDAFTAR", "pendaftar", id, {
@@ -121,6 +122,7 @@ export async function updatePendaftarData(id: string, fields: Record<string, str
 
   revalidatePath("/admin/pendaftar");
   revalidatePath(`/admin/pendaftar/${id}`);
+  revalidatePath("/admin/dashboard");
 
   await insertLogAktivitas("EDIT_DATA_PENDAFTAR", "pendaftar", id, {
     fields_updated: Object.keys(sanitized),
