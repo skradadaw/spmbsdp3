@@ -37,7 +37,7 @@ export async function getDashboardMetrics() {
       // Count by class for all registered students
       if (item.pilihan_kelas === "reguler") metrics.pendaftar_reguler++;
       else if (item.pilihan_kelas === "tahfidz") metrics.pendaftar_tahfidz++;
-      else if (item.pilihan_kelas === "english") metrics.pendaftar_bahasa++;
+      else if (item.pilihan_kelas === "english" || item.pilihan_kelas === "bahasa") metrics.pendaftar_bahasa++;
 
       // Count by status
       if (item.status === "menunggu_verifikasi") metrics.menunggu_verifikasi++;
